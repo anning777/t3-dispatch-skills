@@ -1,0 +1,43 @@
+#!/bin/sh
+# 推送前检查 / Pre-push check
+# 1. main 只能通过合并请求更新，不允许从本地直接推送。
+#    main is updated only through pull requests, never pushed directly.
+# 2. 推送到功能分支的提交必须已过审查：审查通过后，在那个提交上记录
+#    A commit pushed to a feature branch must carry a review record:
+#    git notes --ref=review append -m "<审查结论 / review result>" <提交 / commit>
+#    审查之后又改了任何东西，新的提交没有记录，推送会被拦下。
+#    Anything changed after the review makes a new commit without a record, and the push is refused.
+# 3. 仓库原有的 pre-push（比如 Git LFS 装的）改名成同目录下的 pre-push.local，
+#    检查通过后会收到同样的参数和输入。
+#    The repo's own pre-push (for example the one Git LFS installs), renamed to pre-push.local in this folder,
+#    receives the same arguments and input once these checks pass.
+#    pre-push.local 如果也是本钩子（比如更新时误复制），不会再调用它。
+#    If pre-push.local is this hook itself (for example copied by mistake during an update), it is not called.
+input=$(cat)
+while read local_ref local_sha remote_ref remote_sha; do
+  [ -n "$local_ref" ] || continue
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    echo "拒绝推送到 main：main 只能通过合并请求更新。" >&2
+    echo "改法：把改动推到功能分支，审查通过后开合并请求，CI 通过再合并。" >&2
+    echo "Refusing to push to main: main is updated only through pull requests." >&2
+    echo "Fix: push to a feature branch, open a pull request after review, merge once CI passes." >&2
+    exit 1
+  fi
+  case "$remote_ref" in refs/heads/*) ;; *) continue ;; esac
+  case "$local_sha" in *[!0]*) ;; *) continue ;; esac  # 删除远端分支 / deleting a remote branch
+  if ! git notes --ref=review show "$local_sha" >/dev/null 2>&1; then
+    short=$(git rev-parse --short "$local_sha")
+    echo "拒绝推送 ${remote_ref#refs/heads/}：提交 $short 还没有审查记录。" >&2
+    echo "改法：按 codex-review 派审查，通过后运行 git notes --ref=review append -m \"<审查结论>\" $short，再推送。" >&2
+    echo "Refusing to push ${remote_ref#refs/heads/}: commit $short has no review record." >&2
+    echo "Fix: run the review with codex-review; once it passes, run git notes --ref=review append -m \"<review result>\" $short, then push." >&2
+    exit 1
+  fi
+done <<EOF
+$input
+EOF
+chained="$(dirname "$0")/pre-push.local"
+if [ -x "$chained" ] && ! grep -q '^# 推送前检查 / Pre-push check' "$chained"; then
+  if [ -n "$input" ]; then printf '%s\n' "$input"; fi | "$chained" "$@" || exit $?
+fi
+exit 0

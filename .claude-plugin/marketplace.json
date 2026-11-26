@@ -1,0 +1,17 @@
+{
+  "name": "t3-dispatch-skills",
+  "description": "T3 Code multi-model dispatch skills: Claude or Gemini orchestrates Codex, Gemini and DeepSeek. / T3 Code 多模型派活技能包。",
+  "owner": { "name": "anning777" },
+  "plugins": [
+    {
+      "name": "t3-dispatch-skills",
+      "source": "./zh",
+      "description": "中文版：在 T3 Code 里让 Claude 当主控，派 Codex、Gemini、DeepSeek 分工干活。"
+    },
+    {
+      "name": "t3-dispatch-skills-en",
+      "source": "./en",
+      "description": "English edition: Claude orchestrates Codex, Gemini and DeepSeek in T3 Code."
+    }
+  ]
+}

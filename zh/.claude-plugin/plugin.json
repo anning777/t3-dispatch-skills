@@ -1,0 +1,10 @@
+{
+  "name": "t3-dispatch-skills",
+  "version": "1.0.0",
+  "description": "在 T3 Code 里让 Claude 当主控，派 Codex、Gemini、DeepSeek 分工干活：大方案双出、派代码、文案顾问、审查上线、纠错拦截（中文版）。",
+  "author": { "name": "anning777" },
+  "homepage": "https://github.com/anning777/t3-dispatch-skills",
+  "repository": "https://github.com/anning777/t3-dispatch-skills",
+  "license": "MIT",
+  "keywords": ["t3-code", "multi-model", "orchestration", "codex", "gemini", "deepseek"]
+}
