@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // Installs the Gemini-orchestrator setup for Antigravity (Gemini) in T3 Code: copies the always-on rule into
 // <gemini config>/rules/ and each skill into <gemini config>/skills/. T3 Code links its Antigravity provider's
 // rules and skills folders to ~/.gemini/config, which is the default destination.
@@ -7,10 +8,11 @@
 // edited, added or copied elsewhere are kept. If anything it would write already exists and is not its own, or a
 // manifest with that name is not one it wrote, it stops before writing anything. It never writes or deletes through
 // a symbolic link or junction below <dest>/rules or <dest>/skills, so nothing outside those folders is touched.
-// Usage: node scripts/install-gemini.mjs [--lang zh|en] [--dest <gemini config dir>]
-//        node scripts/install-gemini.mjs --uninstall [--dest <gemini config dir>]
+// Usage: npx -y github:anning777/t3-dispatch-skills [--lang zh|en] [--dest <gemini config dir>]
+//        npx -y github:anning777/t3-dispatch-skills --uninstall [--dest <gemini config dir>]
+// From a downloaded copy of the repo, node scripts/install-gemini.mjs takes the same options.
 import { createHash, randomBytes } from 'node:crypto';
-import { closeSync, existsSync, lstatSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { closeSync, existsSync, lstatSync, mkdirSync, openSync, readdirSync, readFileSync, realpathSync, renameSync, rmdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -229,7 +231,15 @@ export function parseArgs(argv) {
   return options;
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// Run directly, or through npx, which starts it via a link in node_modules/.bin on macOS and Linux.
+const invoked = (() => {
+  try {
+    return Boolean(process.argv[1]) && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+})();
+if (invoked) {
   let options;
   try {
     options = parseArgs(process.argv.slice(2));

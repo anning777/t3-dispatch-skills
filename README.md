@@ -30,15 +30,15 @@ Pick one setup based on the accounts you have, and follow only that one:
 | You have | Pick | How to install |
 | --- | --- | --- |
 | Claude, Gemini and Codex | Standard | Run two commands to install the plugin (see **Option 1** below; skip Option 2) |
-| No Claude, but Gemini and Codex | Lowest bar | Download this repo and run one script (see **Option 2** below; skip Option 1) |
+| No Claude, but Gemini and Codex | Lowest bar | Run one command in a terminal (see **Option 2** below; skip Option 1) |
 
-**Note**: install only one setup, and only one language; installing both makes two sets of rules fight. If you installed the other setup or the other language before, uninstall it first using the steps at the end of its section. "Terminal" below means Terminal on macOS and PowerShell on Windows.
+**Note**: install only one setup, and only one language; installing both makes two sets of rules fight. If you installed the other setup or the other language before, uninstall it first using the steps at the end of its section. "Terminal" below means Terminal on macOS and Command Prompt or PowerShell on Windows.
 
 ### Before you start (both setups)
 
 1. Install the desktop app T3 Code (verified on v0.1.12).
 2. Open T3 Code and connect and sign in to the AIs from the table above (Gemini is called Antigravity there, DeepSeek is called CodeBuddy).
-3. **Option 2 requires Node.js** (the install script runs on it). Option 1 works without it; with Node.js installed, it picks the best-scoring Codex reasoning level for the day (if the scores can't be fetched it reuses the last result, and uses the default `high` only if it has never fetched one), and without Node.js `high` is always used.
+3. **Option 2 requires Node.js (version 18 or later) and Git** (the install command runs on them; the worktrees T3 Code dispatches work into need Git anyway). Option 1 works without it; with Node.js installed, it picks the best-scoring Codex reasoning level for the day (if the scores can't be fetched it reuses the last result, and uses the default `high` only if it has never fetched one), and without Node.js `high` is always used.
 
 ### Option 1: Standard (Claude as orchestrator)
 
@@ -59,21 +59,24 @@ Claude in T3 Code shares the plugins of Claude Code on your computer, so install
 
 ### Option 2: Lowest bar (Gemini as orchestrator)
 
-Gemini in T3 Code doesn't read plugins; it only reads the rules and skills in the `~/.gemini/config` folder, so one script copies the files there.
+Gemini in T3 Code doesn't read plugins; it only reads the rules and skills in the `~/.gemini/config` folder, so one command copies the files there.
 
-1. Download this repo: click the green Code button at the top right of this page → Download ZIP, and unzip it into a folder (if you use git, you can run `git clone https://github.com/anning777/t3-dispatch-skills.git` instead).
-2. Open a terminal, **go into the repo folder you just unzipped first**, then run:
+1. Run this command in a terminal (it fetches the latest version from this repo and installs it, no manual download needed):
 
    ```
-   node scripts/install-gemini.mjs --lang en
+   npx -y github:anning777/t3-dispatch-skills --lang en
    ```
 
-   When you see a list of `installed` lines, it's done (the script has put the orchestrator rule at `~/.gemini/config/rules/t3-dispatch-skills.md` and the 6 skills in `~/.gemini/config/skills/`). For the Chinese edition, use `--lang zh`. If the folder already has same-named files it didn't install, the script stops right away, changes nothing, and lists the conflicting names for you to sort out first.
-3. Back in T3 Code, start a **new** conversation with Gemini as the model (existing conversations won't pick it up).
-4. Check it worked: ask the new conversation "what multi-model dispatch rules do you have now"; if it describes the Gemini-as-orchestrator split, you're done.
-5. Updating or uninstalling later (not needed for a first install): to update, download the latest repo, go into the folder and run the same install command again (files you edited are kept, not overwritten). To uninstall, run `node scripts/install-gemini.mjs --uninstall`, which removes only the files it installed that you haven't edited; if the orchestrator rule line says `kept` (you edited it, so the script left it), that rule stays active. Move the file at the path printed on that line out of its rules folder to turn it off, then start a new Gemini conversation to check.
+   Windows PowerShell blocks `npx` by default (it reports that running scripts is disabled), so in PowerShell write `npx.cmd` instead of `npx` at the start of this command and of the update and uninstall commands below; in Command Prompt no change is needed.
 
-**Troubleshooting (only if the new conversation in step 4 still can't describe the rules)**: in rare cases T3 Code doesn't point Gemini's rules and skills folders at the default `~/.gemini/config` (check where `rules` and `skills` point in `providers/antigravity/<id>/config` under the T3 Code data folder). Then add `--dest <that config folder>` to install where it actually reads, and pass the same `--dest` for every later update and uninstall, for example `node scripts/install-gemini.mjs --lang en --dest "<that config folder>"` to update and `node scripts/install-gemini.mjs --uninstall --dest "<that config folder>"` to uninstall. Without it the script only looks at the default folder, and the rules in your custom folder stay active.
+   When you see a list of `installed` lines, it's done (the command has put the orchestrator rule at `~/.gemini/config/rules/t3-dispatch-skills.md` and the 6 skills in `~/.gemini/config/skills/`). For the Chinese edition, use `--lang zh`. If the folder already has same-named files it didn't install, it stops right away, changes nothing, and lists the conflicting names for you to sort out first.
+2. Back in T3 Code, start a **new** conversation with Gemini as the model (existing conversations won't pick it up).
+3. Check it worked: ask the new conversation "what multi-model dispatch rules do you have now"; if it describes the Gemini-as-orchestrator split, you're done.
+4. Updating or uninstalling later (not needed for a first install): to update, run the same install command again; it fetches the latest version (files you edited are kept, not overwritten). To uninstall, run `npx -y github:anning777/t3-dispatch-skills --uninstall`, which removes only the files it installed that you haven't edited; if the orchestrator rule line says `kept` (you edited it, so it was left in place), that rule stays active. Move the file at the path printed on that line out of its rules folder to turn it off, then start a new Gemini conversation to check.
+
+**Troubleshooting (only if the new conversation in step 3 still can't describe the rules)**: in rare cases T3 Code doesn't point Gemini's rules and skills folders at the default `~/.gemini/config` (check where `rules` and `skills` point in `providers/antigravity/<id>/config` under the T3 Code data folder). Then add `--dest <that config folder>` to install where it actually reads, and pass the same `--dest` for every later update and uninstall, for example `npx -y github:anning777/t3-dispatch-skills --lang en --dest "<that config folder>"` to update and `npx -y github:anning777/t3-dispatch-skills --uninstall --dest "<that config folder>"` to uninstall. Without it only the default folder is looked at, and the rules in your custom folder stay active.
+
+If you'd rather not use npx, download this repo (the green Code button at the top right of this page → Download ZIP, then unzip it), and in that folder run the same commands with `npx -y github:anning777/t3-dispatch-skills` replaced by `node scripts/install-gemini.mjs`.
 
 ### Using it
 

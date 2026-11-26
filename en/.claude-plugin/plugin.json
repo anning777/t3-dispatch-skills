@@ -1,6 +1,6 @@
 {
   "name": "t3-dispatch-skills-en",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Claude orchestrates Codex, Gemini and DeepSeek in T3 Code: dual plans, code dispatch, copy advisor, review and release, correction checks (English edition).",
   "author": { "name": "anning777" },
   "homepage": "https://github.com/anning777/t3-dispatch-skills",

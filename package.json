@@ -1,0 +1,14 @@
+{
+  "name": "t3-dispatch-skills",
+  "version": "1.0.1",
+  "private": true,
+  "description": "Installs the Gemini-orchestrator setup of t3-dispatch-skills for Antigravity (Gemini) in T3 Code.",
+  "license": "MIT",
+  "repository": "github:anning777/t3-dispatch-skills",
+  "bin": {
+    "t3-dispatch-skills": "scripts/install-gemini.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
